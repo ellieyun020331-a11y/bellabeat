@@ -1,0 +1,501 @@
+install.packages("tidyverse")
+library(tidyverse)
+
+setwd("~/Desktop/STA bellabeat/Fitbit Fitness Tracker data")
+getwd()
+library(readr)
+list.files(".", recursive = TRUE)
+
+dailyactivity1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/dailyActivity_merged.csv")
+dailyactivity2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/dailyActivity_merged.csv")
+heartrate1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/heartrate_seconds_merged.csv")
+heartrate2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/heartrate_seconds_merged.csv")
+calorie_hour1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/hourlyCalories_merged.csv")
+calorie_hour2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/hourlyCalories_merged.csv")
+calorie_min1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/minuteCaloriesNarrow_merged.csv")
+calorie_min2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/minuteCaloriesNarrow_merged.csv")
+intensity_hour1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/hourlyIntensities_merged.csv")
+intensity_hour2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/hourlyIntensities_merged.csv")
+intensity_min1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/minuteIntensitiesNarrow_merged.csv")
+intensity_min2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/minuteIntensitiesNarrow_merged.csv")
+sleep_min1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/minuteSleep_merged.csv")
+sleep_min2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/minuteSleep_merged.csv")
+weight1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/weightLogInfo_merged.csv")
+weight2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/weightLogInfo_merged.csv")
+steps1 <- read_csv("mturkfitbit_export_3.12.16-4.11.16/Fitabase Data 3.12.16-4.11.16/hourlySteps_merged.csv")
+steps2 <- read_csv("mturkfitbit_export_4.12.16-5.12.16/Fitabase Data 4.12.16-5.12.16/hourlySteps_merged.csv")
+
+#merging
+dailyactivity <- bind_rows(dailyactivity1, dailyactivity2) 
+heartrate <- bind_rows(heartrate1, heartrate2) 
+calorie_hour <- bind_rows(calorie_hour1, calorie_hour2)
+calorie_min <- bind_rows(calorie_min1, calorie_min2)
+intensity_hour <- bind_rows(intensity_hour1, intensity_hour2)
+intensity_min <- bind_rows(intensity_min1, intensity_min2)
+steps <- bind_rows(steps1, steps2) 
+weight <- bind_rows(weight1, weight2)
+sleep_min <- bind_rows(sleep_min1, sleep_min2)
+
+names(dailyactivity) <- tolower(names(dailyactivity))
+names(heartrate)     <- tolower(names(heartrate))
+names(calorie_hour)  <- tolower(names(calorie_hour))
+names(calorie_min)   <- tolower(names(calorie_min))
+names(intensity_hour)<- tolower(names(intensity_hour))
+names(intensity_min) <- tolower(names(intensity_min))
+names(sleep_min)     <- tolower(names(sleep_min))
+names(weight)        <- tolower(names(weight))
+names(steps)         <- tolower(names(steps))
+
+library(dplyr)
+
+#cleaning data
+#remove duplicates
+dailyactivity <- distinct(dailyactivity)
+heartrate <- distinct(heartrate)
+calorie_hour <- distinct(calorie_hour)
+calorie_min <- distinct(calorie_min)
+intensity_hour <- distinct(intensity_hour)
+intensity_min <- distinct(intensity_min)
+sleep_min <- distinct(sleep_min)
+weight <- distinct(weight)
+steps <- distinct(steps)
+
+#dates& time
+
+if ("activitydate" %in% names(dailyactivity)) {
+  dailyactivity <- dailyactivity %>%
+    mutate(activitydate = mdy(activitydate),
+           date = activitydate)}
+
+if("time" %in% names(heartrate)){
+  heartrate <- heartrate %>%
+    mutate(time = mdy_hms(time),
+           date = as_date(time),
+           hour = hour(time))
+}
+
+if("activityhour" %in% names(calorie_hour)) {
+  calorie_hour <- calorie_hour %>%
+    mutate(activityhour = mdy_hms(activityhour),
+           date = as_date(activityhour),
+           hour = hour(activityhour))
+}
+
+if("activityminute" %in% names(calorie_min)){
+  calorie_min <- calorie_min %>%
+    mutate(activityminute = mdy_hms(activityminute),
+           date = as_date(activityminute),
+           hour = hour(activityminute))
+}
+
+if("activityhour" %in% names(intensity_hour)) {
+  intensity_hour <- intensity_hour %>%
+    mutate(activityhour = mdy_hms(activityhour),
+           date = as_date(activityhour),
+           hour = hour(activityhour))
+}
+
+if("activityminute" %in% names(intensity_min)){
+  intensity_min <- intensity_min %>%
+    mutate(activityminute = mdy_hms(activityminute),
+           date = as_date(activityminute),
+           hour = hour(activityminute))
+}
+
+if("date" %in% names(sleep_min)){
+  sleep_min <- sleep_min %>%
+    mutate(date = mdy_hms(date),
+           date = as_date(date),
+           hour = hour(date))
+}
+
+if("date" %in% names(weight)){
+  weight <- weight %>%
+    mutate(date = mdy_hms(date),
+           date = as_date(date),
+           hour = hour(date))
+}
+
+if("activityhour" %in% names(steps)) {
+  steps <- steps %>%
+    mutate(activityhour = mdy_hms(activityhour),
+           date = as_date(activityhour),
+           hour = hour(activityhour))
+}
+
+n_distinct(dailyactivity$id)
+n_distinct(heartrate$id)
+
+# Date ranges
+range(dailyactivity$date)
+range(heartrate$date)
+
+# Missing values
+colSums(is.na(dailyactivity))
+colSums(is.na(sleep_min))
+summary(select(dailyactivity, totalsteps, totaldistance, sedentaryminutes, calories))
+sleep_day <- sleep_min %>%
+  group_by(id, date) %>%
+  summarise(
+    totalminutesasleep = sum(value == 1, na.rm = TRUE),
+    totaltimeinbed     = n(),
+    .groups = "drop"
+  )
+summary(select(weight, weightkg, bmi, fat))
+heartrate_summary <- heartrate %>%
+  group_by(id, date) %>%
+  summarise(avg_hr = mean(value, na.rm = TRUE), .groups = "drop")
+act_sleep <- dailyactivity %>%
+  inner_join(sleep_day, by = c("id","date"))
+sleep_day <- sleep_day %>%
+  mutate(
+    sleep_hours = totalminutesasleep/60,
+    sleep_efficiency = totalminutesasleep / totaltimeinbed
+  )
+summary(sleep_day$sleep_efficiency)
+act_sleep <- inner_join(
+  dailyactivity %>%
+    select(id, date, totalsteps, totaldistance, sedentaryminutes, calories),
+  sleep_day %>%
+    select(id, date, sleep_hours, sleep_efficiency),
+  by = c("id","date")
+)
+
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(lubridate)
+  library(scales)
+})
+
+# -------------------------------------------------------------------
+# 0) Build daily sleep (from sleep_min) if not already present
+# -------------------------------------------------------------------
+if (!exists("sleep_day")) {
+  stopifnot(all(c("id","date","value") %in% names(sleep_min)))
+  sleep_day <- sleep_min %>%
+    group_by(id, date) %>%
+    summarize(
+      totalminutesasleep = sum(value == 1, na.rm = TRUE),   # 1 = asleep
+      totaltimeinbed     = n(),                             # minutes recorded
+      .groups = "drop"
+    ) %>%
+    mutate(
+      sleep_hours      = totalminutesasleep/60,
+      sleep_efficiency = totalminutesasleep / pmax(totaltimeinbed, 1)
+    ) %>%
+    filter(between(sleep_efficiency, 0.5, 1.0))            # trim weird outliers
+}
+
+# Core daily join (activity + sleep)
+act_sleep <- dailyactivity %>%
+  select(id, date, totalsteps, totaldistance, veryactiveminutes,
+         fairlyactiveminutes, lightlyactiveminutes, sedentaryminutes, calories) %>%
+  inner_join(
+    sleep_day %>% select(id, date, sleep_hours, sleep_efficiency, totalminutesasleep, totaltimeinbed),
+    by = c("id","date")
+  )
+
+# -------------------------------------------------------------------
+# 1) Quick KPIs printed to console
+# -------------------------------------------------------------------
+kpis <- tibble(
+  users_daily   = n_distinct(dailyactivity$id),
+  users_sleep   = n_distinct(sleep_day$id),
+  users_overlap = n_distinct(act_sleep$id),
+  days_daily    = nrow(dailyactivity),
+  days_sleep    = nrow(sleep_day),
+  days_overlap  = nrow(act_sleep),
+  pct_days_10k  = mean(dailyactivity$totalsteps >= 10000, na.rm = TRUE),
+  med_steps     = median(dailyactivity$totalsteps, na.rm = TRUE),
+  med_sleep_h   = median(sleep_day$sleep_hours, na.rm = TRUE),
+  med_eff       = median(sleep_day$sleep_efficiency, na.rm = TRUE)
+)
+print(kpis)
+
+# -------------------------------------------------------------------
+# 2) LEAF (daily activity + sleep)
+# -------------------------------------------------------------------
+# A) Steps vs Sleep Hours
+ggplot(act_sleep, aes(totalsteps, sleep_hours)) +
+  geom_point(alpha = 0.35) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "LEAF: Daily Steps vs Sleep Hours",
+       x = "Daily steps", y = "Sleep (hours)") +
+  theme_minimal()
+
+# B) Sedentary Minutes by Weekday
+dailyactivity %>%
+  mutate(weekday = wday(date, label = TRUE)) %>%
+  ggplot(aes(weekday, sedentaryminutes)) +
+  stat_summary(fun = median, geom = "bar") +
+  labs(title = "LEAF: Median Sedentary Minutes by Weekday",
+       x = "", y = "Minutes") +
+  theme_minimal()
+
+# -------------------------------------------------------------------
+# 3) TIME (watch) — hourly patterns
+# -------------------------------------------------------------------
+# A) Average Steps by Hour
+steps %>%
+  group_by(hour) %>%
+  summarize(avg_steps = mean(steptotal, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(hour, avg_steps)) +
+  geom_line() + geom_point() +
+  scale_x_continuous(breaks = 0:23) +
+  labs(title = "TIME: Average Steps by Hour of Day",
+       x = "Hour of day", y = "Avg steps") +
+  theme_minimal()
+
+# B) Average Calories by Hour
+calorie_hour %>%
+  group_by(hour) %>%
+  summarize(avg_cal = mean(calories, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(hour, avg_cal)) +
+  geom_line() + geom_point() +
+  scale_x_continuous(breaks = 0:23) +
+  labs(title = "TIME: Average Calories by Hour of Day",
+       x = "Hour of day", y = "Avg calories") +
+  theme_minimal()
+
+# -------------------------------------------------------------------
+# 4) SPRING (water bottle) — hydration nudges via sedentary windows
+# -------------------------------------------------------------------
+# Using daily sedentary minutes to see which days are worst (when to nudge hydration)
+dailyactivity %>%
+  mutate(weekday = wday(date, label = TRUE)) %>%
+  group_by(weekday) %>%
+  summarize(median_sedentary = median(sedentaryminutes, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(weekday, median_sedentary)) +
+  geom_col() +
+  labs(title = "SPRING: Median Sedentary Minutes by Weekday",
+       x = "", y = "Minutes/day (median)") +
+  theme_minimal()
+
+# Optional: lightly active minutes by hour as a “breaks” proxy (if column exists)
+if ("hour" %in% names(intensity_hour) && "lightlyactive" %in% names(intensity_hour)) {
+  intensity_hour %>%
+    group_by(hour) %>%
+    summarize(avg_light = mean(lightlyactive, na.rm = TRUE), .groups = "drop") %>%
+    ggplot(aes(hour, avg_light)) +
+    geom_line() + geom_point() +
+    scale_x_continuous(breaks = 0:23) +
+    labs(title = "SPRING: Lightly Active Minutes by Hour (Proxy for Breaks)",
+         x = "Hour of day", y = "Avg lightly active minutes") +
+    theme_minimal()
+}
+
+# -------------------------------------------------------------------
+# 5) APP — segments & holistic relationships
+# -------------------------------------------------------------------
+# Segment users by daily Very Active Minutes (tertiles)
+cuts <- quantile(act_sleep$veryactiveminutes, probs = c(1/3, 2/3), na.rm = TRUE)
+act_sleep_seg <- act_sleep %>%
+  mutate(activity_segment = case_when(
+    veryactiveminutes <= cuts[1] ~ "Low",
+    veryactiveminutes <= cuts[2] ~ "Medium",
+    TRUE ~ "High"
+  ))
+
+# A) Sleep Efficiency by Activity Segment
+ggplot(act_sleep_seg, aes(activity_segment, sleep_efficiency, fill = activity_segment)) +
+  geom_boxplot(outlier.alpha = 0.2) +
+  labs(title = "APP: Sleep Efficiency by Activity Segment",
+       x = "Daily activity segment", y = "Sleep efficiency") +
+  theme_minimal() + guides(fill = "none") +
+  scale_y_continuous(labels = percent_format(accuracy = 1))
+
+# B) Steps vs Calories
+ggplot(dailyactivity, aes(totalsteps, calories)) +
+  geom_point(alpha = 0.35) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "APP: Steps vs Calories",
+       x = "Daily steps", y = "Calories") +
+  theme_minimal()
+
+# -------------------------------------------------------------------
+# 6) MEMBERSHIP — who benefits from coaching?
+# -------------------------------------------------------------------
+# A) % of days each user reaches 10K steps
+dailyactivity %>%
+  group_by(id) %>%
+  summarize(pct_days_10k = mean(totalsteps >= 10000, na.rm = TRUE)*100, .groups = "drop") %>%
+  ggplot(aes(pct_days_10k)) +
+  geom_histogram(binwidth = 10) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  labs(title = "MEMBERSHIP: % of Days Users Reach 10K Steps",
+       x = "% of days (per user)", y = "Users") +
+  theme_minimal()
+
+# B) Sleep efficiency distribution (daily)
+ggplot(sleep_day, aes(sleep_efficiency)) +
+  geom_histogram(binwidth = 0.05) +
+  scale_x_continuous(labels = percent_format(accuracy = 1)) +
+  labs(title = "MEMBERSHIP: Sleep Efficiency Distribution",
+       x = "Sleep efficiency", y = "Days") +
+  theme_minimal()
+
+# C) User cohorts: median steps vs median sleep efficiency
+risk_users <- act_sleep %>%
+  group_by(id) %>%
+  summarize(
+    med_steps = median(totalsteps, na.rm = TRUE),
+    med_eff   = median(sleep_efficiency, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    low_steps = med_steps < 8000,
+    poor_sleep = med_eff < 0.80,
+    at_risk    = low_steps | poor_sleep
+  )
+
+ggplot(risk_users, aes(med_steps, med_eff, color = at_risk)) +
+  geom_point(size = 2, alpha = 0.85) +
+  geom_hline(yintercept = 0.80, linetype = "dashed") +
+  geom_vline(xintercept = 10000, linetype = "dashed") +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  labs(title = "MEMBERSHIP: Median Steps vs Sleep Efficiency (Users)",
+       x = "Median daily steps", y = "Median sleep efficiency") +
+  theme_minimal()
+
+# ============================
+# SAVE ALL PLOTS (Option 1)
+# ============================
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(lubridate)
+  library(scales)
+})
+dir.create("figs", showWarnings = FALSE)
+
+# --- LEAF ---
+p_leaf_steps_sleep <- ggplot(act_sleep, aes(totalsteps, sleep_hours)) +
+  geom_point(alpha = 0.35) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "LEAF: Daily Steps vs Sleep Hours",
+       x = "Daily steps", y = "Sleep (hours)") +
+  theme_minimal()
+ggsave("figs/leaf_steps_vs_sleep.png", p_leaf_steps_sleep, width = 7, height = 5, dpi = 300)
+
+p_leaf_sedentary <- dailyactivity %>%
+  mutate(weekday = wday(date, label = TRUE)) %>%
+  ggplot(aes(weekday, sedentaryminutes)) +
+  stat_summary(fun = median, geom = "bar") +
+  labs(title = "LEAF: Median Sedentary Minutes by Weekday",
+       x = "", y = "Minutes") +
+  theme_minimal()
+ggsave("figs/leaf_sedentary_by_weekday.png", p_leaf_sedentary, width = 7, height = 5, dpi = 300)
+
+# --- TIME ---
+p_time_steps <- steps %>%
+  group_by(hour) %>%
+  summarize(avg_steps = mean(steptotal, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(hour, avg_steps)) +
+  geom_line() + geom_point() +
+  scale_x_continuous(breaks = 0:23) +
+  labs(title = "TIME: Average Steps by Hour of Day",
+       x = "Hour of day", y = "Avg steps") +
+  theme_minimal()
+ggsave("figs/time_avg_steps_by_hour.png", p_time_steps, width = 7, height = 5, dpi = 300)
+
+p_time_cal <- calorie_hour %>%
+  group_by(hour) %>%
+  summarize(avg_cal = mean(calories, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(hour, avg_cal)) +
+  geom_line() + geom_point() +
+  scale_x_continuous(breaks = 0:23) +
+  labs(title = "TIME: Average Calories by Hour of Day",
+       x = "Hour of day", y = "Avg calories") +
+  theme_minimal()
+ggsave("figs/time_avg_calories_by_hour.png", p_time_cal, width = 7, height = 5, dpi = 300)
+
+# --- SPRING ---
+p_spring_sedentary <- dailyactivity %>%
+  mutate(weekday = wday(date, label = TRUE)) %>%
+  group_by(weekday) %>%
+  summarize(median_sedentary = median(sedentaryminutes, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(weekday, median_sedentary)) +
+  geom_col() +
+  labs(title = "SPRING: Median Sedentary Minutes by Weekday",
+       x = "", y = "Minutes/day (median)") +
+  theme_minimal()
+ggsave("figs/spring_sedentary_by_weekday.png", p_spring_sedentary, width = 7, height = 5, dpi = 300)
+
+# If your intensity_hour has a column like "lightlyactive", save a breaks-by-hour proxy too
+if ("hour" %in% names(intensity_hour) && any(names(intensity_hour) %in% c("lightlyactive","lightlyactiveminutes"))) {
+  lightly_col <- intersect(c("lightlyactive","lightlyactiveminutes"), names(intensity_hour))[1]
+  p_spring_breaks <- intensity_hour %>%
+    group_by(hour) %>%
+    summarize(avg_light = mean(.data[[lightly_col]], na.rm = TRUE), .groups = "drop") %>%
+    ggplot(aes(hour, avg_light)) +
+    geom_line() + geom_point() +
+    scale_x_continuous(breaks = 0:23) +
+    labs(title = "SPRING: Lightly Active Minutes by Hour (Breaks Proxy)",
+         x = "Hour of day", y = "Avg lightly active minutes") +
+    theme_minimal()
+  ggsave("figs/spring_lightlyactive_by_hour.png", p_spring_breaks, width = 7, height = 5, dpi = 300)
+}
+
+# --- APP ---
+p_app_steps_cal <- ggplot(dailyactivity, aes(totalsteps, calories)) +
+  geom_point(alpha = 0.35) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "APP: Steps vs Calories",
+       x = "Daily steps", y = "Calories") +
+  theme_minimal()
+ggsave("figs/app_steps_vs_calories.png", p_app_steps_cal, width = 7, height = 5, dpi = 300)
+
+cuts <- quantile(act_sleep$veryactiveminutes, probs = c(1/3, 2/3), na.rm = TRUE)
+act_sleep_seg <- act_sleep %>%
+  mutate(activity_segment = case_when(
+    veryactiveminutes <= cuts[1] ~ "Low",
+    veryactiveminutes <= cuts[2] ~ "Medium",
+    TRUE ~ "High"
+  ))
+p_app_sleep_eff <- ggplot(act_sleep_seg, aes(activity_segment, sleep_efficiency, fill = activity_segment)) +
+  geom_boxplot(outlier.alpha = 0.2) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  labs(title = "APP: Sleep Efficiency by Activity Segment",
+       x = "Daily activity segment", y = "Sleep efficiency") +
+  theme_minimal() + guides(fill = "none")
+ggsave("figs/app_sleep_efficiency_by_segment.png", p_app_sleep_eff, width = 7, height = 5, dpi = 300)
+
+# --- MEMBERSHIP ---
+p_mem_pct10k <- dailyactivity %>%
+  group_by(id) %>%
+  summarize(pct_days_10k = mean(totalsteps >= 10000, na.rm = TRUE)*100, .groups = "drop") %>%
+  ggplot(aes(pct_days_10k)) +
+  geom_histogram(binwidth = 10) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  labs(title = "MEMBERSHIP: % of Days Users Reach 10K Steps",
+       x = "% of days (per user)", y = "Users") +
+  theme_minimal()
+ggsave("figs/membership_pct_days_10k.png", p_mem_pct10k, width = 7, height = 5, dpi = 300)
+
+p_mem_sleep_dist <- ggplot(sleep_day, aes(sleep_efficiency)) +
+  geom_histogram(binwidth = 0.05) +
+  scale_x_continuous(labels = percent_format(accuracy = 1)) +
+  labs(title = "MEMBERSHIP: Sleep Efficiency Distribution",
+       x = "Sleep efficiency", y = "Days") +
+  theme_minimal()
+ggsave("figs/membership_sleep_efficiency_dist.png", p_mem_sleep_dist, width = 7, height = 5, dpi = 300)
+
+risk_users <- act_sleep %>%
+  group_by(id) %>%
+  summarize(
+    med_steps = median(totalsteps, na.rm = TRUE),
+    med_eff   = median(sleep_efficiency, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(at_risk = med_steps < 10000 | med_eff < 0.80)
+
+p_mem_risk_scatter <- ggplot(risk_users, aes(med_steps, med_eff, color = at_risk)) +
+  geom_point(size = 2, alpha = 0.85) +
+  geom_hline(yintercept = 0.80, linetype = "dashed") +
+  geom_vline(xintercept = 10000, linetype = "dashed") +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  labs(title = "MEMBERSHIP: Median Steps vs Sleep Efficiency (Users)",
+       x = "Median daily steps", y = "Median sleep efficiency") +
+  theme_minimal()
+ggsave("figs/membership_steps_vs_efficiency_users.png", p_mem_risk_scatter, width = 7, height = 5, dpi = 300)
+
+message("✅ Saved plots to ./figs. Embed in README with ![](figs/filename.png)")
