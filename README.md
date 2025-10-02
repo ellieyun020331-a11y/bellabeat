@@ -52,4 +52,7 @@ All CSV files from the two Fitbit export folders were uploaded into R.
 	•	Built act_sleep by joining daily activity + daily sleep (on id + date) for correlation analysis.
 
 ## analysis 
+**Steps vs Sleep Hours**
+![Steps vs Sleep](figs/leaf_steps_vs_sleep.png)
+
 
