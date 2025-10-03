@@ -1,3 +1,4 @@
+'''r
 install.packages("tidyverse")
 library(tidyverse)
 
@@ -499,3 +500,4 @@ p_mem_risk_scatter <- ggplot(risk_users, aes(med_steps, med_eff, color = at_risk
 ggsave("figs/membership_steps_vs_efficiency_users.png", p_mem_risk_scatter, width = 7, height = 5, dpi = 300)
 
 message("✅ Saved plots to ./figs. Embed in README with ![](figs/filename.png)")
+'''r
